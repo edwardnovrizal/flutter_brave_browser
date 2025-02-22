@@ -12,8 +12,10 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 class FlutterBraveBrowserPlugin: FlutterPlugin, MethodCallHandler {
 
     private lateinit var channel: MethodChannel
+    private lateinit var applicationContext: android.content.Context  // Tambahkan ini
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        applicationContext = flutterPluginBinding.applicationContext // Simpan context
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_brave_browser")
         channel.setMethodCallHandler(this)
     }
@@ -37,7 +39,7 @@ class FlutterBraveBrowserPlugin: FlutterPlugin, MethodCallHandler {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
         try {
-            channel.binaryMessenger.applicationContext.startActivity(intent)
+            applicationContext.startActivity(intent) // Perbaiki di sini
             result.success(true)
         } catch (e: Exception) {
             result.error("FAILED_TO_OPEN", "Brave Browser not installed", null)
