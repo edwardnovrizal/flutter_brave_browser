@@ -5,14 +5,22 @@
 // platforms in the `pubspec.yaml` at
 // https://flutter.dev/to/pubspec-plugin-platforms.
 
+import 'package:flutter/services.dart';
+
 import 'flutter_brave_browser_platform_interface.dart';
 
 class FlutterBraveBrowser {
+  static const MethodChannel _channel = MethodChannel('flutter_brave_browser');
+
   Future<String?> getPlatformVersion() {
     return FlutterBraveBrowserPlatform.instance.getPlatformVersion();
   }
 
-  Future<void> openBrave(String url) {
-    return FlutterBraveBrowserPlatform.instance.openBrave(url);
+  static Future<void> openBrave(String url) async {
+    try {
+      await _channel.invokeMethod('openBrave', {'url': url});
+    } on PlatformException catch (e) {
+      print("Failed to open Brave Browser: ${e.message}");
+    }
   }
 }
