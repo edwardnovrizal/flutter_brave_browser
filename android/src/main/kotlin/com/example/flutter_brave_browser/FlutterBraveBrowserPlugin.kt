@@ -21,7 +21,7 @@ class FlutterBraveBrowserPlugin: FlutterPlugin, MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        if (call.method == "openBrave") {
+        if (call.method == "openBraveCustomTab") {
             val url: String? = call.argument("url")
             if (url != null) {
                 openBraveCustomTab(url, result)

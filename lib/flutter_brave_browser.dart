@@ -18,7 +18,7 @@ class FlutterBraveBrowser {
 
   static Future<void> openBrave(String url) async {
     try {
-      await _channel.invokeMethod('openBrave', {'url': url});
+      await _channel.invokeMethod('openBraveCustomTab', {'url': url});
     } on PlatformException catch (e) {
       print("Failed to open Brave Browser: ${e.message}");
     }

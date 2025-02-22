@@ -40,6 +40,6 @@ class MethodChannelFlutterBraveBrowser extends FlutterBraveBrowserPlatform {
 
   @override
   Future<void> openBrave(String url) async {
-    await _channel.invokeMethod('openBrave', {"url": url});
+    await _channel.invokeMethod('openBraveCustomTab', {"url": url});
   }
 }
