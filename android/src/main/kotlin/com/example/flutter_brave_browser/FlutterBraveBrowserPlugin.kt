@@ -15,11 +15,11 @@ class FlutterBraveBrowserPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private var context: android.content.Context? = null
 
-    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_brave_browser")
-        channel.setMethodCallHandler(this)
-        context = flutterPluginBinding.applicationContext
-    }
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_brave_browser")
+    channel.setMethodCallHandler(this)
+    applicationContext = flutterPluginBinding.applicationContext // ✅ Simpan Context dengan benar
+}
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "openBrave") {
@@ -35,27 +35,17 @@ class FlutterBraveBrowserPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private fun openBrave(url: String, result: MethodChannel.Result) {
-        val bravePackageName = "com.brave.browser"
-        val uri = Uri.parse(url)
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    intent.setPackage("com.brave.browser")
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // ✅ Tambahkan flag ini
 
-        val customTabsIntent = CustomTabsIntent.Builder()
-            .setShowTitle(true)
-            .setInstantAppsEnabled(false)
-            .build()
-
-        customTabsIntent.intent.setPackage(bravePackageName)
-
-        try {
-            context?.let {
-                customTabsIntent.launchUrl(it, uri)
-                result.success(true)
-            } ?: run {
-                result.error("CONTEXT_NULL", "Context is not available", null)
-            }
-        } catch (e: ActivityNotFoundException) {
-            result.error("FAILED_TO_OPEN", "Brave Browser is not installed", null)
-        }
+    try {
+        applicationContext.startActivity(intent) // ✅ Panggil dengan applicationContext yang benar
+        result.success(true)
+    } catch (e: Exception) {
+        result.error("FAILED_TO_OPEN", "Brave Browser not installed or cannot be opened", null)
     }
+}
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
