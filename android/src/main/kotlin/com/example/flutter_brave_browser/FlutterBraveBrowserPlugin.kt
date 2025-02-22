@@ -1,7 +1,6 @@
 package com.example.flutter_brave_browser
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import androidx.annotation.NonNull
 import androidx.browser.customtabs.CustomTabsIntent
@@ -13,19 +12,19 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 class FlutterBraveBrowserPlugin: FlutterPlugin, MethodCallHandler {
 
     private lateinit var channel: MethodChannel
-    private lateinit var context: Context // ✅ Simpan context dengan benar
+    private lateinit var context: Context
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_brave_browser")
         channel.setMethodCallHandler(this)
-        context = flutterPluginBinding.applicationContext // ✅ Simpan Context dari Flutter Engine
+        context = flutterPluginBinding.applicationContext
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "openBrave") {
             val url: String? = call.argument("url")
             if (url != null) {
-                openBrave(url, result)
+                openBraveCustomTab(url, result)
             } else {
                 result.error("INVALID_URL", "URL is required", null)
             }
@@ -34,13 +33,16 @@ class FlutterBraveBrowserPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun openBrave(url: String, result: MethodChannel.Result) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        intent.setPackage("com.brave.browser") // Paket Brave Browser
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // ✅ Tambahkan flag ini
-
+    private fun openBraveCustomTab(url: String, result: MethodChannel.Result) {
         try {
-            context.startActivity(intent) // ✅ Gunakan `context` yang benar
+            val customTabsIntent = CustomTabsIntent.Builder()
+                .setShowTitle(true) // Menampilkan judul di tab
+                .build()
+
+            // Gunakan Brave sebagai browser default untuk Custom Tabs
+            customTabsIntent.intent.setPackage("com.brave.browser")
+
+            customTabsIntent.launchUrl(context, Uri.parse(url))
             result.success(true)
         } catch (e: Exception) {
             result.error("FAILED_TO_OPEN", "Brave Browser not installed or cannot be opened", null)
