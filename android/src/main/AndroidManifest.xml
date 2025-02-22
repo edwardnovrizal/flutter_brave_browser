@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.example.flutter_brave_browser">
+  <queries>
+    <package android:name="com.brave.browser" />
+</queries>
+
+</manifest>
